@@ -109,7 +109,7 @@ def substitute():
         return jsonify({"error": "position and bench_player_id required"}), 400
 
     try:
-        rotation_manager.substitute(position - 1, bench_player_id)
+        rotation_manager.substitute(position, bench_player_id)
     except ValueError as e:
         return jsonify({"error": str(e)}), 400
 
