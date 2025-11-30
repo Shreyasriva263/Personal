@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Volleyball Tracker</title>
+</head>
+<body>
+    <h1>Volleyball Rotation Tracker</h1>
+    <p>If you can read this, Flask is serving HTML correctly!</p>
+
+    <button onclick="testApi()">Test API Call</button>
+
+    <div id="output"></div>
+
+    <script>
+        async function testApi() {
+            const response = await fetch("/api/hello");
+            const data = await response.json();
+            document.getElementById("output").innerText = data.message;
+        }
+    </script>
+</body>
+</html>
