@@ -1,157 +1,208 @@
 <!DOCTYPE html>
 <html>
+
 <head>
-  <meta charset="UTF-8" />
-  <title>Volleyball Rotation Tracker</title>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    h1 { margin-bottom: 10px; }
-    .controls {
-      margin-bottom: 20px;
-    }
-    .court {
-      display: grid;
-      grid-template-columns: repeat(3, 120px);
-      grid-gap: 10px;
-      margin-bottom: 20px;
-    }
-    .position {
-      border: 1px solid #ccc;
-      padding: 10px;
-      text-align: center;
-      border-radius: 6px;
-    }
-    .position strong {
-      display: block;
-      margin-bottom: 5px;
-    }
-    .log {
-      max-height: 200px;
-      overflow-y: auto;
-      border: 1px solid #ccc;
-      padding: 10px;
-      font-size: 0.9rem;
-      background: #fafafa;
-    }
-    button {
-      margin-right: 8px;
-      padding: 6px 12px;
-      cursor: pointer;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <title>Volleyball Rotation Tracker</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+
+        h1 {
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+        }
+
+        .court {
+            display: grid;
+            grid-template-columns: repeat(3, 120px);
+            grid-gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .position {
+            border: 1px solid #ccc;
+            padding: 10px;
+            text-align: center;
+            border-radius: 6px;
+        }
+
+        .position strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .log {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            font-size: 0.9rem;
+            background: #fafafa;
+        }
+
+        button {
+            margin-right: 8px;
+            padding: 6px 12px;
+            cursor: pointer;
+        }
+    </style>
 </head>
+
 <body>
-  <h1>Volleyball Rotation Tracker</h1>
+    <h1>Volleyball Rotation Tracker</h1>
 
-  <div class="controls">
-    <h2>Controls</h2>
-    <p>
-      For now, the starting lineup is players with IDs [1,2,3,4,5,6].<br>
-      Click <strong>Start Set</strong>, then <strong>Rotate</strong>.
-    </p>
-    <button onclick="startSet()">Start Set</button>
-    <button onclick="rotate()">Rotate</button>
-    <button onclick="refreshState()">Refresh State</button>
-  </div>
+    <div class="controls">
+        <h2>Controls</h2>
+        <p>
+            For now, the starting lineup is players with IDs [1,2,3,4,5,6].<br>
+            Click <strong>Start Set</strong>, then <strong>Rotate</strong>.
+        </p>
+        <button onclick="startSet()">Start Set</button>
+        <button onclick="rotate()">Rotate</button>
+        <button onclick="refreshState()">Refresh State</button>
+        <button onclick="substitute()">Substitute</button>
+    </div>
 
-  <h2>Court (Positions 1–6)</h2>
-  <div class="court" id="court">
-    <!-- Filled by JavaScript -->
-  </div>
+    <h2>Court (Positions 1–6)</h2>
+    <div class="court" id="court">
+        <!-- Filled by JavaScript -->
+    </div>
 
-  <h2>Event Log</h2>
-  <div class="log" id="log">
-    <!-- Filled by JavaScript -->
-  </div>
+    <h2>Event Log</h2>
+    <div class="log" id="log">
+        <!-- Filled by JavaScript -->
+    </div>
 
-  <script>
-    let players = {};
+    <script>
+        let players = {};
 
-    async function loadPlayers() {
-      const res = await fetch("/api/players");
-      const data = await res.json();
-      data.forEach(p => {
-        players[p.id] = p;
-      });
-    }
+        async function loadPlayers() {
+            const res = await fetch("/api/players");
+            const data = await res.json();
+            data.forEach(p => {
+                players[p.id] = p;
+            });
+        }
 
-    function displayCourt(courtIds) {
-      const courtDiv = document.getElementById("court");
-      courtDiv.innerHTML = "";
+        function displayCourt(courtIds) {
+            const courtDiv = document.getElementById("court");
+            courtDiv.innerHTML = "";
 
-      const labels = ["Pos 1", "Pos 2", "Pos 3", "Pos 4", "Pos 5", "Pos 6"];
+            const labels = ["Pos 1", "Pos 2", "Pos 3", "Pos 4", "Pos 5", "Pos 6"];
 
-      courtIds.forEach((pid, idx) => {
-        const p = players[pid];
-        const div = document.createElement("div");
-        div.className = "position";
-        div.innerHTML = `
+            courtIds.forEach((pid, idx) => {
+                const p = players[pid];
+                const div = document.createElement("div");
+                div.className = "position";
+                div.innerHTML = `
           <strong>${labels[idx]}</strong>
           ${p ? "#" + p.number + " " + p.name : "Empty"}
         `;
-        courtDiv.appendChild(div);
-      });
-    }
+                courtDiv.appendChild(div);
+            });
+        }
 
-    async function startSet() {
-      const res = await fetch("/api/start-set", {
-        method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ starting_court_ids: [1,2,3,4,5,6] })
-      });
-      const data = await res.json();
-      if (data.error) {
-        alert(data.error);
-      } else {
-        displayCourt(data.court);
-        loadEvents();
-      }
-    }
+        async function startSet() {
+            const res = await fetch("/api/start-set", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ starting_court_ids: [1, 2, 3, 4, 5, 6] })
+            });
+            const data = await res.json();
+            if (data.error) {
+                alert(data.error);
+            } else {
+                displayCourt(data.court);
+                loadEvents();
+            }
+        }
 
-    async function refreshState() {
-      const res = await fetch("/api/state");
-      const data = await res.json();
-      if (data.error) {
-        alert(data.error);
-      } else {
-        displayCourt(data.court);
-      }
-    }
+        async function refreshState() {
+            const res = await fetch("/api/state");
+            const data = await res.json();
+            if (data.error) {
+                alert(data.error);
+            } else {
+                displayCourt(data.court);
+            }
+        }
 
-    async function rotate() {
-      const res = await fetch("/api/rotate", {
-        method: "POST"
-      });
-      const data = await res.json();
-      if (data.error) {
-        alert(data.error);
-      } else {
-        displayCourt(data.court);
-        loadEvents();
-      }
-    }
+        async function rotate() {
+            const res = await fetch("/api/rotate", {
+                method: "POST"
+            });
+            const data = await res.json();
+            if (data.error) {
+                alert(data.error);
+            } else {
+                displayCourt(data.court);
+                loadEvents();
+            }
+        }
+        async function substitute() {
+            const posStr = prompt("Enter the court POSITION (1–6) where you want to sub OUT:");
+            const benchStr = prompt("Enter the BENCH PLAYER ID to sub IN:");
 
-    async function loadEvents() {
-      const res = await fetch("/api/events");
-      const data = await res.json();
-      const logDiv = document.getElementById("log");
-      logDiv.innerHTML = "";
+            const position = parseInt(posStr, 10);
+            const benchId = parseInt(benchStr, 10);
 
-      if (data.error) {
-        logDiv.textContent = data.error;
-        return;
-      }
+            if (
+                isNaN(position) || isNaN(benchId) ||
+                position < 1 || position > 6
+            ) {
+                alert("Invalid input. Position must be 1–6 and bench player ID must be a number.");
+                return;
+            }
 
-      data.sort((a, b) => a.sequence - b.sequence);
-      data.forEach(e => {
-        const line = document.createElement("div");
-        line.textContent = `${e.sequence}. ${e.type.toUpperCase()} – ${JSON.stringify(e.details)}`;
-        logDiv.appendChild(line);
-      });
-    }
+            const res = await fetch("/api/substitute", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    position: position,          // 1–6, which court spot is going OUT
+                    bench_player_id: benchId     // must currently be on the bench
+                })
+            });
 
-    // On page load: load players so we can display names/numbers
-    loadPlayers();
-  </script>
+            const data = await res.json();
+            console.log("Substitute response:", data); // TEMP debug
+
+            if (data.error) {
+                alert(data.error);
+            } else {
+                displayCourt(data.court);  // redraw court with new IDs
+                loadEvents();              // reload the event log (should show substitution)
+            }
+        }
+
+
+        async function loadEvents() {
+            const res = await fetch("/api/events");
+            const data = await res.json();
+            const logDiv = document.getElementById("log");
+            logDiv.innerHTML = "";
+
+            if (data.error) {
+                logDiv.textContent = data.error;
+                return;
+            }
+
+            data.sort((a, b) => a.sequence - b.sequence);
+            data.forEach(e => {
+                const line = document.createElement("div");
+                line.textContent = `${e.sequence}. ${e.type.toUpperCase()} – ${JSON.stringify(e.details)}`;
+                logDiv.appendChild(line);
+            });
+        }
+
+        // On page load: load players so we can display names/numbers
+        loadPlayers();
+    </script>
 </body>
+
 </html>
