@@ -1,0 +1,2 @@
+This project is a Python-based tool designed to help track player rotations in a volleyball game. The application allows users to manage team lineups and automatically update player positions as rotations occur during gameplay.
+The goal of the project was to build a simple system that models volleyball rotation rules while practicing Python programming concepts such as data structures, program logic, and user interaction.
